@@ -1,0 +1,88 @@
+using System;
+using System.Collections.Generic;
+
+namespace AhorcadoSimple
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // === CONFIGURACIÓN INICIAL ===
+            string palabraSecreta = "SISTEMAS"; 
+            int vidas = 6; // Sistema de vidas
+            
+            // Estructuras de datos solicitadas por la rúbrica
+            char[] progreso = new char[palabraSecreta.Length]; // Arreglo para la palabra oculta
+            List<char> letrasUsadas = new List<char>();       // Lista para las letras intentadas
+
+            // Inicializar el arreglo con guiones bajos
+            for (int i = 0; i < progreso.Length; i++)
+            {
+                progreso[i] = '_';
+            }
+
+            // === BUCLE PRINCIPAL DEL JUEGO ===
+            while (vidas > 0 && new string(progreso).Contains("_"))
+            {
+                Console.Clear();
+                Console.WriteLine("=== JUEGO DEL AHORCADO ===");
+                Console.WriteLine($"Palabra: {string.Join(" ", progreso)}");
+                Console.WriteLine($"Vidas restantes: {vidas}");
+                Console.WriteLine($"Letras usadas: {string.Join(", ", letrasUsadas)}");
+                Console.WriteLine("-----------------------------------");
+
+                // Volcar y validar la entrada del usuario
+                Console.Write("Introduce una letra: ");
+                string entrada = Console.ReadLine().ToUpper();
+
+                if (string.IsNullOrEmpty(entrada) || letrasUsadas.Contains(entrada[0]))
+                {
+                    Console.WriteLine("Letra no válida o ya utilizada. Pulsa Enter...");
+                    Console.ReadLine();
+                    continue;
+                }
+
+                char letraUsuario = entrada[0];
+                letrasUsadas.Add(letraUsuario); // Guardar en la estructura de datos
+
+                // Verificar si la letra está en la palabra
+                bool acierto = false;
+                for (int i = 0; i < palabraSecreta.Length; i++)
+                {
+                    if (palabraSecreta[i] == letraUsuario)
+                    {
+                        progreso[i] = letraUsuario; // Actualiza el arreglo
+                        acierto = true;
+                    }
+                }
+
+                // Penalizar si no acertó
+                if (!acierto)
+                {
+                    vidas--;
+                    Console.WriteLine("¡Incorrecto! Perdiste una vida.");
+                }
+                else
+                {
+                    Console.WriteLine("¡Bien hecho! Acertaste.");
+                }
+
+                Console.WriteLine("Pulsa Enter para continuar...");
+                Console.ReadLine();
+            }
+
+            // === LÓGICA DE GANAR / PERDER ===
+            Console.Clear();
+            if (!new string(progreso).Contains("_"))
+            {
+                Console.WriteLine("¡Felicidades! Ganaste la partida. :)");
+                Console.WriteLine($"La palabra era: {palabraSecreta}");
+            }
+            else
+            {
+                Console.WriteLine("Te quedaste sin vidas. Perdiste el juego. :(");
+                Console.WriteLine($"La palabra correcta era: {palabraSecreta}");
+            }
+        }
+    }
+}

@@ -1,0 +1,176 @@
+using System;
+using System.Collections.Generic;
+
+namespace AhorcadoProyecto
+{
+    // ==========================================
+    // CLASE: Palabra
+    // Encargada de la lógica de la palabra secreta
+    // ==========================================
+    public class Palabra
+    {
+        private string palabraSecreta;
+        private char[] progresoPalabra; // Arreglo para controlar la palabra oculta
+
+        public Palabra(string palabra)
+        {
+            palabraSecreta = palabra.ToUpper();
+            progresoPalabra = new char[palabraSecreta.Length];
+            
+            // Inicializar el progreso con guiones bajos
+            for (int i = 0; i < progresoPalabra.Length; i++)
+            {
+                progresoPalabra[i] = '_';
+            }
+        }
+
+        public string ObtenerProgreso()
+        {
+            return string.Join(" ", progresoPalabra);
+        }
+
+        // Valida si la letra está en la palabra y actualiza el progreso
+        public bool VerificarLetra(char letra)
+        {
+            bool acierto = false;
+            for (int i = 0; i < palabraSecreta.Length; i++)
+            {
+                if (palabraSecreta[i] == letra)
+                {
+                    progresoPalabra[i] = letra;
+                    acierto = true;
+                }
+            }
+            return acierto;
+        }
+
+        public bool EstaCompleta()
+        {
+            // Si ya no quedan guiones bajos, la palabra fue descubierta
+            return !string.Concat(progresoPalabra).Contains("_");
+        }
+    }
+
+    // ==========================================
+    // CLASE: Jugador
+    // Controla las vidas y las letras usadas
+    // ==========================================
+    public class Jugador
+    {
+        public int Vidas { get; private set; }
+        private List<char> letrasUsadas; // Lista para controlar letras ya intentadas
+
+        public Jugador(int vidasIniciales)
+        {
+            Vidas = vidasIniciales;
+            letrasUsadas = new List<char>();
+        }
+
+        public void ReducirVida()
+        {
+            Vidas--;
+        }
+
+        public bool RegistrarLetra(char letra)
+        {
+            if (letrasUsadas.Contains(letra))
+            {
+                return false; // La letra ya se había intentado
+            }
+            letrasUsadas.Add(letra);
+            return true;
+        }
+
+        public string ObtenerLetrasUsadas()
+        {
+            return string.Join(", ", letrasUsadas);
+        }
+    }
+
+    // ==========================================
+    // CLASE PRINCIPAL: Juego
+    // Controla el flujo y la lógica de ganar/perder
+    // ==========================================
+    public class Partida
+    {
+        private Palabra palabraJuego;
+        private Jugador jugadorJuego;
+
+        public Partida(string palabraSecreta, int vidas)
+        {
+            palabraJuego = new Palabra(palabraSecreta);
+            jugadorJuego = new Jugador(vidas);
+        }
+
+        public void Iniciar()
+        {
+            // Ejecución fluida del juego mientras haya vidas y no se haya ganado
+            while (jugadorJuego.Vidas > 0 && !palabraJuego.EstaCompleta())
+            {
+                Console.Clear();
+                Console.WriteLine("=== JUEGO DEL AHORCADO ===");
+                Console.WriteLine($"Palabra a adivinar: {palabraJuego.ObtenerProgreso()}");
+                Console.WriteLine($"Vidas restantes: {jugadorJuego.Vidas}");
+                Console.WriteLine($"Letras intentadas: {jugadorJuego.ObtenerLetrasUsadas()}");
+                Console.WriteLine("-----------------------------------");
+
+                Console.Write("Ingresa una letra: ");
+                string entrada = Console.ReadLine();
+
+                // Validación de entrada para evitar fallas
+                if (string.IsNullOrEmpty(entrada) || entrada.Length > 1 || !char.IsLetter(entrada[0]))
+                {
+                    Console.WriteLine("Por favor, ingresa una sola letra válida. Presiona Enter para continuar...");
+                    Console.ReadLine();
+                    continue;
+                }
+
+                char letra = char.ToUpper(entrada[0]);
+
+                // Registrar e intentar la letra
+                if (!jugadorJuego.RegistrarLetra(letra))
+                {
+                    Console.WriteLine($"Ya intentaste la letra '{letra}'. Intenta otra. Presiona Enter...");
+                    Console.ReadLine();
+                    continue;
+                }
+
+                if (palabraJuego.VerificarLetra(letra))
+                {
+                    Console.WriteLine("¡Acertaste una letra!");
+                }
+                else
+                {
+                    Console.WriteLine("La letra no está en la palabra.");
+                    jugadorJuego.ReducirVida();
+                }
+
+                Console.WriteLine("Presiona Enter para continuar...");
+                Console.ReadLine();
+            }
+
+            // Lógica final de ganar / perder
+            Console.Clear();
+            if (palabraJuego.EstaCompleta())
+            {
+                Console.WriteLine("¡FELICIDADES! ¡Has ganado el juego! :D");
+                Console.WriteLine($"La palabra era: {palabraJuego.ObtenerProgreso()}");
+            }
+            else
+            {
+                Console.WriteLine("GAME OVER. Te has quedado sin vidas. :(");
+            }
+        }
+    }
+
+    // Punto de entrada del programa
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Aquí puedes definir la palabra de forma estática o usar un arreglo de opciones
+            Partida nuevaPartida = new Partida("Sistemas", 6);
+            nuevaPartida.Iniciar();
+        }
+    }
+}

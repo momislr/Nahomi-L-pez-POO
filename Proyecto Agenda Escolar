@@ -1,0 +1,268 @@
+using System;
+using System.Collections.Generic;
+
+namespace AgendaEscolar
+{
+    public static class Program
+    {
+        static List<Contacto> agenda = new List<Contacto>();
+
+        public static void Main()
+        {
+            int opcion = 0;
+
+            while (opcion != 6)
+            {
+                Console.WriteLine("\n===== AGENDA ESCOLAR =====");
+                Console.WriteLine("1. Agregar alumno");
+                Console.WriteLine("2. Agregar profesor");
+                Console.WriteLine("3. Mostrar contactos");
+                Console.WriteLine("4. Buscar contacto");
+                Console.WriteLine("5. Eliminar contacto");
+                Console.WriteLine("6. Salir");
+                Console.Write("Selecciona una opcion: ");
+
+                int.TryParse(Console.ReadLine(), out opcion);
+
+                if (opcion == 1)
+                {
+                    AgregarAlumno();
+                }
+                else if (opcion == 2)
+                {
+                    AgregarProfesor();
+                }
+                else if (opcion == 3)
+                {
+                    MostrarContactos();
+                }
+                else if (opcion == 4)
+                {
+                    BuscarContacto();
+                }
+                else if (opcion == 5)
+                {
+                    EliminarContacto();
+                }
+                else if (opcion == 6)
+                {
+                    Console.WriteLine("Hasta luego.");
+                }
+                else
+                {
+                    Console.WriteLine("Opcion invalida.");
+                }
+            }
+        }
+
+        public static void AgregarAlumno()
+        {
+            Console.Write("Nombre: ");
+            string nom = Console.ReadLine();
+
+            Console.Write("Telefono: ");
+            string tel = Console.ReadLine();
+
+            Console.Write("Correo: ");
+            string cor = Console.ReadLine();
+
+            Console.Write("Matricula: ");
+            string mat = Console.ReadLine();
+
+            Console.Write("Carrera: ");
+            string car = Console.ReadLine();
+
+            Console.Write("Grupo: ");
+            string gru = Console.ReadLine();
+
+            agenda.Add(new Alumno(nom, tel, cor, mat, car, gru));
+            Console.WriteLine("Alumno agregado correctamente.");
+        }
+
+        public static void AgregarProfesor()
+        {
+            Console.Write("Nombre: ");
+            string nom = Console.ReadLine();
+
+            Console.Write("Telefono: ");
+            string tel = Console.ReadLine();
+
+            Console.Write("Correo: ");
+            string cor = Console.ReadLine();
+
+            Console.Write("Coordinacion: ");
+            string coor = Console.ReadLine();
+
+            agenda.Add(new Profesor(nom, tel, cor, coor));
+            Console.WriteLine("Profesor agregado correctamente.");
+        }
+
+        public static void MostrarContactos()
+        {
+            if (agenda.Count == 0)
+            {
+                Console.WriteLine("La agenda esta vacia.");
+                return;
+            }
+
+            Console.WriteLine("\n===== LISTA DE CONTACTOS =====");
+            for (int i = 0; i < agenda.Count; i++)
+            {
+                Console.WriteLine("\nContacto #" + (i + 1));
+                agenda[i].MostrarInformacion();
+            }
+        }
+
+        public static void BuscarContacto()
+        {
+            Console.Write("Ingresa el nombre a buscar: ");
+            string nombre = Console.ReadLine();
+
+            for (int i = 0; i < agenda.Count; i++)
+            {
+                if (agenda[i].Nombre.ToLower() == nombre.ToLower())
+                {
+                    Console.WriteLine("Contacto encontrado.");
+                    agenda[i].MostrarInformacion();
+                    return;
+                }
+            }
+
+            Console.WriteLine("Contacto no encontrado.");
+        }
+
+        public static void EliminarContacto()
+        {
+            Console.Write("Ingresa el nombre a eliminar: ");
+            string nombre = Console.ReadLine();
+
+            for (int i = 0; i < agenda.Count; i++)
+            {
+                if (agenda[i].Nombre.ToLower() == nombre.ToLower())
+                {
+                    agenda.RemoveAt(i);
+                    Console.WriteLine("Contacto eliminado correctamente.");
+                    return;
+                }
+            }
+
+            Console.WriteLine("Contacto no encontrado.");
+        }
+    }
+}
+using System;
+
+namespace AgendaEscolar
+{
+    public class Contacto
+    {
+        private string nombre;
+        private string telefono;
+        private string correo;
+
+        public string Nombre
+        {
+            get { return nombre; }
+            set { nombre = value; }
+        }
+
+        public string Telefono
+        {
+            get { return telefono; }
+            set { telefono = value; }
+        }
+
+        public string Correo
+        {
+            get { return correo; }
+            set { correo = value; }
+        }
+
+        public Contacto(string nom, string tel, string cor)
+        {
+            nombre = nom;
+            telefono = tel;
+            correo = cor;
+        }
+
+        public virtual void MostrarInformacion()
+        {
+            Console.WriteLine("Nombre:   " + nombre);
+            Console.WriteLine("Telefono: " + telefono);
+            Console.WriteLine("Correo:   " + correo);
+        }
+    }
+using System;
+
+namespace AgendaEscolar
+{
+    public class Alumno : Contacto
+    {
+        private string matricula;
+        private string carrera;
+        private string grupo;
+
+        public string Matricula
+        {
+            get { return matricula; }
+            set { matricula = value; }
+        }
+
+        public string Carrera
+        {
+            get { return carrera; }
+            set { carrera = value; }
+        }
+
+        public string Grupo
+        {
+            get { return grupo; }
+            set { grupo = value; }
+        }
+
+        public Alumno(string nom, string tel, string cor,
+                      string mat, string car, string gru)
+            : base(nom, tel, cor)
+        {
+            matricula = mat;
+            carrera = car;
+            grupo = gru;
+        }
+
+        public override void MostrarInformacion()
+        {
+            Console.WriteLine("---- ALUMNO ----");
+            base.MostrarInformacion();
+            Console.WriteLine("Matricula: " + matricula);
+            Console.WriteLine("Carrera:   " + carrera);
+            Console.WriteLine("Grupo:     " + grupo);
+        }
+    }
+}
+using System;
+
+namespace AgendaEscolar
+{
+    class Profesor : Contacto
+    {
+        private string coordinacion;
+
+        public string Coordinacion
+        {
+            get { return coordinacion; }
+            set { coordinacion = value; }
+        }
+
+        public Profesor(string nom, string tel, string cor, string coor)
+            : base(nom, tel, cor)
+        {
+            coordinacion = coor;
+        }
+
+        public override void MostrarInformacion()
+        {
+            Console.WriteLine("---- PROFESOR ----");
+            base.MostrarInformacion();
+            Console.WriteLine("Coordinacion: " + coordinacion);
+        }
+    }
